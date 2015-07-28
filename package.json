@@ -1,0 +1,17 @@
+{
+  "name": "rad1oserver",
+  "version": "1.0.0",
+  "description": "rad1o badge backend server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mjg",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.13.2",
+    "ejs": "^2.3.3",
+    "express": "^4.13.1",
+    "mysql": "^2.8.0"
+  }
+}

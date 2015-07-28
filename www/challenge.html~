@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<% var pageTitle = 'challenge'; %>
+<html>
+<% include head.html %>
+
+<body>
+
+<div id="badge_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
+	<% include header_nav.html %>
+  
+  <main class="mdl-layout__content content">
+		<!-- Wide card with share menu button -->
+		<style>
+			.demo-card-wide.mdl-card {
+				width: 640px;
+			}
+			.demo-card-wide > .mdl-card__title {
+				height: 176px;
+				background: url('/img/logo.png') center / cover;
+			}
+		</style>
+
+		<div class="mdl-card mdl-shadow--2dp demo-card-wide">
+			<div class="mdl-card__title">
+				<div style="position: absolute; top: 5px; left: 20px;">id <%= number%></div>
+				<div style="position: absolute; top: 5px; right: 20px;">points<br><%= points%></div>				
+				<h2 class="mdl-card__title-text"><%= title%></h2>
+			</div>
+			<form>			
+				<div class="mdl-card__supporting-text" style="margin-top: 2em;">
+					<p>
+						<%= description%>
+					</p>				
+					<p style="margin: 0 2em">
+						<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="answer1">
+							<input type="radio" id="answer1" class="mdl-radio__button" name="options" value="1" />
+							<span class="mdl-radio__label"><%= answer1%></span>
+						</label>
+						<br />
+						<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="answer2">
+							<input type="radio" id="answer2" class="mdl-radio__button" name="options" value="2" />
+							<span class="mdl-radio__label"><%= answer2%></span>
+						</label>
+						<br />
+						<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="answer3">
+							<input type="radio" id="answer3" class="mdl-radio__button" name="options" value="1" />
+							<span class="mdl-radio__label"><%= answer3%></span>
+						</label>
+						<br />
+						<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="answer4">
+							<input type="radio" id="answer4" class="mdl-radio__button" name="options" value="2" />
+							<span class="mdl-radio__label"><%= answer4%></span>
+						</label>
+					</p>
+					<p>
+					</p>
+				</div>
+				<div class="mdl-card__actions mdl-card--border">
+					<div>
+						<div>typ <%= classid%></div>
+						<div>by <%= credits%></div>
+					</div>
+					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" style="position: absolute; bottom: 10px; right: 20px;" type="button" id="challenge_sendanswer" value="send answer">
+				</div>
+			</div>
+		</form>  
+  	</main>
+</div>
+
+
+</body>
+
+</html> 
