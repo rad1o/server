@@ -1,10 +1,23 @@
 body {
-	background: #E0E0E0 url('/img/rad1o_gray.jpg') no-repeat center;
+	background: #E0E0E0 url('/rad1o_gray.jpg') no-repeat center;
+}
+
+main {
+	background:rgba(255,255,255,0.7);
+	box-shadow: 10px 10px 5px rgba(100,100,100,0.4);
 }
 
 .content {
-	margin: 0 auto;
+	margin: 1em auto;
 	padding: 1em;
+}
+
+.mdl-textfield {
+	margin: 0em 1em;
+}
+
+.mdl-textfield__label {
+	color: #505050;
 }
 
 .mdl-layout__header {
@@ -12,7 +25,7 @@ body {
 }
 
 .mdl-card__title-text {
-	text-shadow: -1px -1px white;
+	text-shadow: -1px -1px 5px white;
 }
 
 @font-face {
@@ -21,6 +34,8 @@ body {
   font-weight: 400;
   src: local('Material Icons'),
   		local('MaterialIcons-Regular'),
+  		url(mir.woff2) format('woff2'),
+  		url(mir.woff) format('woff'),
   		url(MaterialIcons-Regular.woff2) format('woff2'),
   		url(MaterialIcons-Regular.woff) format('woff'),
   		url(MaterialIcons-Regular.ttf) format('truetype');

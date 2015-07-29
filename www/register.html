@@ -11,30 +11,30 @@
   <main class="mdl-layout__content content">
   <div>
 		<p>
-		Here you can register your badge, so you will be able to participate to our challanges. Please enter the following data:
+		Here you can register your badge, so you will be able to participate to our challenges. Please enter the following data:
 		</p>
 
-		<form action="registerbadge" method="post" name="badge_registration">
+		<form action="registerbadge" method="post" name="badge_registration" <!-- enctype="multipart/form-data" -->>
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_id" />
 				<label class="mdl-textfield__label" for="badge_id">badge id</label>
 			</div>
-			<br>
+			
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_key" />
 				<label class="mdl-textfield__label" for="badge_key">badge secret key</label>
 			</div>
-			<br>
+			<br />
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_nick" />
 				<label class="mdl-textfield__label" for="badge_nick">nick / name</label>
 			</div>
-			<br>
+			
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_callsign" />
 				<label class="mdl-textfield__label" for="badge_callsign">call sign (optional)</label>
 			</div>
-			<br>
+			<br />
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_email" />
 				<label class="mdl-textfield__label" for="badge_email">email (optional)</label>
@@ -44,12 +44,12 @@
 				<input class="mdl-textfield__input" style="padding-left: 10em;" type="file" name="badge_image" accept="image/*" />
 				<label class="mdl-textfield__label" for="badge_image">image (optional)</label>
 			</div>
-			<!-- <br>
+			<!-- <br />
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_password1" />
 				<label class="mdl-textfield__label" for="badge_password1">password (optional)</label>
 			</div>
-			<br>
+
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_badge_password2" />
 				<label class="mdl-textfield__label" for="badge_password2">repeat password</label>
