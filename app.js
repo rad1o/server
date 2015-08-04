@@ -27,16 +27,87 @@ app.set('views', __dirname + "/www");
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
+	extended: true
 }));
 
 app.get('/',function(req,res){
-  res.sendFile(path.join(__dirname+'/www/index.html'));
-  //__dirname : It will resolve to your project folder.
+	if (req.body.badgeid === undefined || req.body.badgekey === undefined) {
+		// TODO Login
+	}
+	else {
+		dbpool.getConnection(function(err, connection) {
+			connection.query("SELECT sp_nickname from TA_BADGE where sp_badge_id=? and sp_badge_key=?", 
+			[req.query.badgeid, req.query.badgekey],
+					function(err, rows) {
+				connection.release();
+
+				if (err) {
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				var badge;
+				if (rows.length != 1) {
+					res.redirect('/register');
+				}
+				else {			
+					res.render(path.join(__dirname+'/www/index.html'), { nickname : rows[0].sp_nickname });
+				}
+			});
+		});
+	}
 });
 
-app.get('/register',function(req,res){
-  res.render(path.join(__dirname+'/www/register.html'));
+app.get('/register',function(req,res) {
+	//console.log('register: ', req.query.badgeid, "   ", req.query.badgekey);
+	if (req.query.badgeid !== undefined && req.query.badgekey !== undefined) {
+		dbpool.getConnection(function(err, connection) {
+			connection.query("SELECT * from TA_BADGE where sp_badge_id=? and sp_badge_key=?", 
+			[req.query.badgeid, req.query.badgekey],
+					function(err, rows) {
+				connection.release();
+
+				if (err) {
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				var badge;
+				if (rows.length != 1) {
+					badge = {
+						badge_id       : "",
+						badge_key      : "",
+						badge_nickname : "",
+						badge_callsign : "",
+						badge_email    : ""
+					}
+				}
+				else {
+					var result = rows[0];				
+					
+					badge = {
+						badge_id       : result.sp_badge_id,
+						badge_key      : result.sp_badge_key,
+						badge_nickname : result.sp_nickname,
+						badge_callsign : result.sp_callsign,
+						badge_email    : result.sp_email
+					}
+				}
+				
+				res.render(path.join(__dirname+'/www/register.html'), badge);
+			});
+		});
+	} 
+	else {
+		var badge = {
+			badge_id       : "",
+			badge_key      : "",
+			badge_nickname : "",
+			badge_callsign : "",
+			badge_email    : ""
+		}
+		res.render(path.join(__dirname+'/www/register.html'), badge);
+	}
 });
 
 app.get('/challenge',function(req,res){
@@ -50,9 +121,14 @@ app.get('/challenge',function(req,res){
 	dbpool.getConnection(function(err, connection) {
 		connection.query("SELECT * from TA_CHALLENGE where sp_number=?",
 				[challengeId],
-				function(err, rows, fields) {
+				function(err, rows) {
 			connection.release();
-			if (err) throw err;
+
+			if (err) {
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+				return;	
+			}
+			
 			//console.log('Query result: ', rows[0]);
 			
 			var challenge = rows[0]; 
@@ -80,7 +156,11 @@ app.get('/highscore',function(req,res){
 	dbpool.getConnection(function(err, connection) {
 		connection.query('SELECT * from TA_BADGE_CHALLENGE GROUP BY fk_badge  ' + challengeId + ';', function(err, rows, fields) {
 			connection.release();				
-			if (err) throw err;
+			
+			if (err) {
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+				return;	
+			}
 			
 			var challenge = rows[0]; 
 				
@@ -135,7 +215,7 @@ app.post('/registerbadge',function(req,res){
 					}
 					
 					if (result.changedRows == 1) {
-						res.render(path.join(__dirname+'/www/success.html'), {message : "badge data updated."});		
+						res.render(path.join(__dirname+'/www/success.html'), {message : "badge data updated.", target : "/"});		
 					} else {
 						res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: badge not updated."});		
 					}

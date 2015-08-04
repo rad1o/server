@@ -28,6 +28,11 @@ main {
 	text-shadow: -1px -1px 5px white;
 }
 
+.mdl-card__actions {
+	margin-top: 2em;
+	align-content: right;
+}
+
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;

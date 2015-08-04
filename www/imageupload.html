@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<% var pageTitle = 'rad1o'; %>
+<html>
+<% include head.html %>
+
+<body>
+
+<div id="badge_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
+	<% include header_nav.html %>
+  
+  <main class="mdl-layout__content content">
+  <div>
+		<p>
+		Upload an image to convert it into the badge format. If you like, you can also use this as your avatar on this site.
+		</p>
+
+		<form action="registerbadge" method="post" name="badge_registration" <!-- enctype="multipart/form-data" -->>
+			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+				<input class="mdl-textfield__input" style="padding-left: 10em;" type="file" name="badge_image" accept="image/*" />
+				<label class="mdl-textfield__label" for="badge_image">image (optional)</label>
+			</div>
+			
+			<div style="margin-top: 2em;">
+				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+					type="submit" id="convertimage" value="upload and convert" />
+			</div>
+		</form>
+	</div>
+  </main>
+</div>
+
+
+</body>
+
+</html> 
