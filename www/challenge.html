@@ -12,13 +12,14 @@
 		<!-- Wide card with share menu button -->
 		<style>
 			.demo-card-wide.mdl-card {
-				width: 640px;
+				min-width: 100%;				
+				max-width: 25em;
 				background: none;
 				border: none;
 			}
 			.demo-card-wide > .mdl-card__title {
 				height: 176px;
-				background: url('/img/logo.png') center / cover;
+				background: url('/logo.png') center;
 			}
 		</style>
 
@@ -58,10 +59,11 @@
 				</div>
 				<div class="mdl-card__actions mdl-card--border">
 					<div>
-						<div>id <%= number%> typ <%= classid%></div>
+						<div>id <%= number%></div>
 						<div>by <%= credits%></div>
 					</div>
-					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" style="position: absolute; bottom: 10px; right: 20px;" type="button" id="challenge_sendanswer" value="send answer">
+					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+						style="float: right;" type="button" id="challenge_sendanswer" value="send answer">
 				</div>
 			</div>
 		</form>  

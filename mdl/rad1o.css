@@ -31,6 +31,7 @@ main {
 .mdl-card__actions {
 	margin-top: 2em;
 	align-content: right;
+	width: 100%;
 }
 
 @font-face {
@@ -60,4 +61,15 @@ main {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   color: white;
+}
+
+.toptentable img {
+	width:  4em;
+	height: 4em;
+	margin: 1px;
+	padding: 0px;
+}
+
+.toptentable-self {
+	background-color: #FFCCCC;
 }

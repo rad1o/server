@@ -8,21 +8,18 @@
 <div id="badge_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
 	
-	<main>
-		<table class="mdl-data-table mdl-js-data-table">
+	<main class="mdl-layout__content content">
+		<table class="mdl-data-table mdl-js-data-table toptentable">
 		  <thead>
 		    <tr>
-		      <th class="mdl-data-table__cell--non-numeric">Name</th>
-		      <th>Age</th>
-		      <th>ID Number</th>
+		      <th class="mdl-data-table__cell--numeric">rank</th>
+		      <th class="mdl-data-table__cell--non-numeric" colspan="2">player</th>
+		      <th class="mdl-data-table__cell--numeric">score</th>
+		      <th class="mdl-data-table__cell--numeric">completed</th>
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <tr>
-		      <td class="mdl-data-table__cell--non-numeric">Don Aubrey</td>
-		      <td>25</td>
-		      <td>49021</td>
-		    </tr>
+			<%- toptentable%>
 		  </tbody>
 		</table>
 	</main>

@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS TA_FIRMWARE;
 DROP TABLE IF EXISTS TA_LOCATION;
 DROP TABLE IF EXISTS TA_BADGE;
 
+DROP TABLE IF EXISTS MV_HIGHSCORE;
+
 SET NAMES 'utf8';
 SET CHARACTER SET 'utf8';
 
@@ -101,3 +103,29 @@ CREATE TABLE TA_MESSAGE_BADGE (
 	sp_time_ack			timestamp		default 0,
 	CONSTRAINT PK_OID PRIMARY KEY (fk_badge, fk_message)
 );
+
+
+-- MVs
+CREATE TABLE MV_HIGHSCORE AS
+select  @currow := @currow + 1 as rank,
+		badgeid, 
+		nickname,
+        image,
+        score,
+        challenges_played
+from (
+	select  b.sp_badge_id      as badgeid,
+			b.sp_nickname      as nickname,
+			b.sp_icon          as image,
+			sum(bc.sp_score)   as score,
+			count(bc.fk_badge) as challenges_played
+	from TA_BADGE_CHALLENGE bc
+	inner join TA_BADGE b on bc.fk_badge = b.sp_oid
+	group by bc.fk_badge
+	order by score desc
+) scores
+JOIN (SELECT @currow := 0) r
+;
+
+create index IN_HIGHSCORE_BADGE_ID ON
+MV_HIGHSCORE(badgeid);
