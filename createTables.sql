@@ -60,7 +60,7 @@ CREATE TABLE TA_BADGE_CHALLENGE (
 	sp_comment			varchar(300)	default NULL,
 	sp_score			integer			not NULL,
 	sp_answer			integer			NOT NULL,
-	sp_time_done		timestamp		NOT NULL,
+	sp_time_done		timestamp		default CURRENT_TIMESTAMP,
 	sp_data				blob			default NULL,
 	CONSTRAINT PK_OID PRIMARY KEY (fk_badge, fk_challenge)
 );

@@ -225,6 +225,21 @@ app.post('/challenge', function(req,res)
 		return;
 	}
 	
+	dbpool.getConnection(function(err, connection)
+	{
+		connection.query("SELECT * from TA_CHALLENGE where sp_number=?",
+		[challengeId],
+		function(err, rows)
+		{
+			connection.release();
+
+			if (err)
+			{
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+				return;	
+			}
+		});
+	});
 });
 
 app.get('/highscore',function(req,res)
