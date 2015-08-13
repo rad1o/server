@@ -1,9 +1,11 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var app = express();
+var express_session = require('express-session');
 var path = require("path");
 var ejs = require('ejs'); 
 var favicon = require('serve-favicon');
+var crypto = require('crypto');
 
 var mysql = require('mysql');
 var dbpool = mysql.createPool(
@@ -21,12 +23,18 @@ app.use(express.static('img'));
 
 app.use(favicon(__dirname + '/img/favicon.ico'));
 
+app.use(express_session({
+	secret: 'uzJUTvotdw6azdf789654wWjB3sxucivoppJJGhkio',
+	resave: true,
+	saveUninitialized: true
+}));
+
 app.set("view options", {layout: false});  
 app.engine('html', require('ejs').renderFile); 
 app.set('view engine', 'html');
 app.set('views', __dirname + "/www");
 
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded(
 {
 	// to support URL-encoded bodies
@@ -35,52 +43,75 @@ app.use(bodyParser.urlencoded(
 
 app.get('/',function(req,res)
 {
-	if (req.body.badgeid === undefined || req.body.badgekey === undefined)
+	if (!req.session.badgeid)
 	{
-		// TODO Login
+		res.render(path.join(__dirname+'/www/login.html'));
+		return;
 	}
-	else
-	{
-		dbpool.getConnection(function(err, connection)
-		{
-			connection.query("SELECT sp_nickname from TA_BADGE where sp_badge_id=? and sp_badge_key=?", 
-			[req.query.badgeid, req.query.badgekey],
-					function(err, rows)
-					{
-				connection.release();
-
-				if (err)
-				{
-					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
-					return;	
-				}
-				
-				var badge;
-				if (rows.length != 1)
-				{
-					res.redirect('/register');
-				}
-				else
-				{			
-					res.render(path.join(__dirname+'/www/index.html'), { nickname : rows[0].sp_nickname });
-				}
-			});
-		});
-	}
+	
+	res.render(path.join(__dirname+'/www/index.html'), { nickname : req.session.nickname });
 });
 
+app.post('/login',function(req,res)
+{
+	if (req.body.login_nickname == "" || req.body.login_password == "")
+	{
+		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "mandatory values not set:<br/>nickname or password"});	
+		return;
+	}
+	
+	var session = req.session;
+	var nickname = req.body.login_nickname;
+	var password = req.body.login_password;
+
+	dbpool.getConnection(function(err, connection)
+	{
+		var sqlStatement = "UPDATE TA_BADGE SET sp_last_seen=now() WHERE sp_nickname=? and sp_password=?";
+		var sqlValues = [nickname, password];
+		connection.query(sqlStatement, sqlValues, function(err, result)
+		{
+			if (err)
+			{
+				connection.release();			
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+				return;	
+			}
+			
+			if (result.changedRows == 1)
+			{
+				var sqlStatement = "select sp_badge_id from TA_BADGE WHERE sp_nickname=? and sp_password=?";
+				var sqlValues = [nickname, password];
+				connection.query(sqlStatement, sqlValues, function(err, result)
+				{
+					connection.release();
+					session.nickname = nickname;
+					session.badgeid = result[0].sp_badge_id;
+					
+					res.render(path.join(__dirname+'/www/success.html'), {
+						message : "you are now logged in. please select something from the menu.",
+						target : "/"
+					});		
+				});
+			}
+			else
+			{
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: you could not be logged in. please check the data you entered."});		
+			}
+		});
+	});
+});
 
 app.get('/register',function(req,res)
 {
 	//console.log('register: ', req.query.badgeid, "   ", req.query.badgekey);
-	if (req.query.badgeid !== undefined && req.query.badgekey !== undefined)
+	if (req.session.badgeid)
 	{
 		dbpool.getConnection(function(err, connection)
 		{
-			connection.query("SELECT * from TA_BADGE where sp_badge_id=? and sp_badge_key=?", 
-			[req.query.badgeid, req.query.badgekey],
-					function(err, rows)
-					{
+			connection.query("SELECT * from TA_BADGE where sp_badge_id=?", 
+			[req.session.badgeid],
+			function(err, rows)
+			{
 				connection.release();
 
 				if (err)
@@ -97,7 +128,8 @@ app.get('/register',function(req,res)
 						badge_key      : "",
 						badge_nickname : "",
 						badge_callsign : "",
-						badge_email    : ""
+						badge_email    : "",
+						badge_password : ""
 					}
 				}
 				else
@@ -109,7 +141,8 @@ app.get('/register',function(req,res)
 						badge_key      : result.sp_badge_key,
 						badge_nickname : result.sp_nickname,
 						badge_callsign : result.sp_callsign,
-						badge_email    : result.sp_email
+						badge_email    : result.sp_email,
+						badge_password : result.sp_password
 					}
 				}
 				
@@ -124,7 +157,8 @@ app.get('/register',function(req,res)
 			badge_key      : "",
 			badge_nickname : "",
 			badge_callsign : "",
-			badge_email    : ""
+			badge_email    : "",
+			badge_password : ""
 		}
 		res.render(path.join(__dirname+'/www/register.html'), badge);
 	}
@@ -134,7 +168,7 @@ app.get('/challenge',function(req,res)
 {
 	var challengeId = req.query.challengeid;
 	
-	if (challengeId === undefined)
+	if (!challengeId)
 	{
 		res.render(path.join(__dirname+'/www/challengechooser.html'));
 		return;
@@ -143,9 +177,9 @@ app.get('/challenge',function(req,res)
 	dbpool.getConnection(function(err, connection)
 	{
 		connection.query("SELECT * from TA_CHALLENGE where sp_number=?",
-				[challengeId],
-				function(err, rows)
-				{
+		[challengeId],
+		function(err, rows)
+		{
 			connection.release();
 
 			if (err)
@@ -175,9 +209,27 @@ app.get('/challenge',function(req,res)
 	});
 });
 
+app.post('/challenge', function(req,res)
+{	
+	var session = req.session;
+
+	if (!session.badgeid)
+	{
+		res.render(path.join(__dirname+'/www/login.html'));
+		return;
+	}
+	
+	if (!req.body.challenge_id)
+	{
+		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "mandatory values not set:<br/>nickname or password"});	
+		return;
+	}
+	
+});
+
 app.get('/highscore',function(req,res)
 {
-	var badgeId = req.query.badgeid;
+	var badgeId = req.session.badgeid;
 	
 	if (badgeId === undefined)
 	{
@@ -238,16 +290,28 @@ app.get('/highscore',function(req,res)
 
 app.post('/registerbadge',function(req,res)
 {	
-	if (req.body.badge_nick == "" || req.body.badge_id == "" || req.body.badge_key == "")
+	if (req.body.badge_nick == "" || req.body.badge_password1 == "" || req.body.badge_password1 != req.body.badge_password2)
 	{
-		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "mandatory values not set:\nbadge_id, badge_key or nickname"});	
+		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "mandatory values not set:<br/>nickname or password"});	
 		return;
 	}
 	
+	var session = req.session;
+	
 	dbpool.getConnection(function(err, connection)
 	{
-		var sqlStatement = "UPDATE TA_BADGE SET sp_nickname=?, sp_callsign=?, sp_email=? WHERE sp_badge_id=? and sp_badge_key=?";
-		var sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_id, req.body.badge_key];
+		var sqlStatement;
+		var sqlValues;
+		if (session.badgeid)
+		{
+			sqlStatement = "UPDATE TA_BADGE SET sp_nickname=?, sp_callsign=?, sp_email=?, sp_password=? WHERE sp_badge_id=?";
+			sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_password1, session.badge_id];
+		}
+		else
+		{
+			sqlStatement = "insert into TA_BADGE (sp_nickname, sp_callsign, sp_email, sp_password, sp_register_time, sp_badge_id) values (?, ?, ?, ?, now(), ?)";
+			sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_password1, crypto.randomBytes(32)];
+		}	
 		connection.query(sqlStatement, sqlValues, function(err, result)
 		{
 			connection.release();			
@@ -257,79 +321,77 @@ app.post('/registerbadge',function(req,res)
 				return;	
 			}
 			
-			if (result.changedRows == 1)
+			if (result.affectedRows == 1)
 			{
-				res.render(path.join(__dirname+'/www/success.html'), {message : "badge data updated.", target : "/imageconverter"});		
+				res.render(path.join(__dirname+'/www/success.html'), {
+					message : "badge data updated. if you want, you can now upload an image as avatar. if not, please select something from the menu.",
+					target : "/imageconverter"
+				});		
 			}
 			else
 			{
-				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: badge not updated. please check the data you entered."});		
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: badge not updated. please check the data you entered. maybe the nickname is already in use. error: " + err});		
 			}
 		});
 	});
 });
 
-app.post('/uploadimage',function(req,res)
+app.get('/imageconverter',function(req,res)
 {	
-	if (req.body.badge_nick == "" || req.body.badge_id == "" || req.body.badge_key == "")
+	if (!req.session.badgeid)
 	{
-		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "mandatory values not set:\nbadge_id, badge_key or nickname"});	
+		res.render(path.join(__dirname+'/www/login.html'));
 		return;
 	}
 	
-	dbpool.getConnection(function(err, connection)
+	res.render(path.join(__dirname+'/www/imageupload.html'));
+});
+
+app.post('/imageupload',function(req,res)
+{
+	var session = req.session;
+	
+	if (!req.session.badgeid)
 	{
-		connection.query("SELECT sp_oid, sp_nickname from TA_BADGE WHERE sp_badge_id=? and sp_badge_key=?", 
-			[req.body.badge_id, req.body.badge_key],
-			function(err, rows)
-			{
-				
-			if (err)
-			{
-				connection.release();
-				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
-				return;	
-			}
+		res.redirect('/');
+		return;
+	}
 		
-			if (rows.length == 1)
+	if (true || req.body.image_avatar)
+	{
+		dbpool.getConnection(function(err, connection)
+		{
+			var sqlStatement = "UPDATE TA_BADGE SET sp_icon=? WHERE sp_badge_id=?";
+			var sqlValues = [req.files.image.path, session.badgeid];
+			connection.query(sqlStatement, sqlValues, function(err, result)
 			{
-				var sqlStatement, sqlValues;
-				if (req.body.badge_image === undefined)
+				connection.release();			
+				if (err)
 				{
-					sqlStatement = "UPDATE TA_BADGE SET sp_nickname=?, sp_callsign=?, sp_email=? WHERE sp_oid=?";
-					sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, rows[0].sp_oid];
+					console.log('Error in imageupload (post) for ', session.nickname, ' : ', err);
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				if (result.affectedRows == 1)
+				{
+					res.render(path.join(__dirname+'/www/success.html'), {
+						message : "your image was added as your avatar.",
+						target : "/"
+					});		
 				}
 				else
 				{
-					sqlStatement = "UPDATE TA_BADGE SET sp_nickname=?, sp_callsign=?, sp_email=?, sp_icon=? WHERE sp_oid=?";
-					sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_image, rows[0].sp_oid];				
+					console.log('Error in imageupload (post) for ', session.nickname, ' : ', err);
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: badge not updated. please check the data you entered. error: " + err});		
 				}
-				connection.query(sqlStatement, sqlValues, function(err, result)
-				{
-					connection.release();			
-					if (err)
-					{
-						res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
-						return;
-					}
-					
-					if (result.changedRows == 1)
-					{
-						res.render(path.join(__dirname+'/www/success.html'), {message : "badge data updated.", target : "/imageconverter"});		
-					}
-					else
-					{
-						res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: badge not updated."});		
-					}
-				});
-			}
-			else
-			{
-				connection.release();
-				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: no badge with this id and key found."});		
-			}
+			});
 		});
-	});
+	}
+	else
+	{
+		res.render(path.join(__dirname+'/www/index.html'));
+	}
 });
 
 

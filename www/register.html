@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<% var pageTitle = 'register your badge'; %>
+<% var pageTitle = 'register or edit your profile'; %>
 <html>
 <% include head.html %>
 
 <body>
 
-<div id="badge_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
+<div id="register_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
   <main class="mdl-layout__content content">
   <div>
 		<p>
-		Here you can register your badge, so you will be able to participate to our challenges. Please enter the following data:
+		here you can register, so you will be able to participate to our challenges. please enter the following data:
 		</p>
 
 		<form action="registerbadge" method="post" name="badge_registration">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+<!--			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_id" value="<%= badge_id%>" />
 				<label class="mdl-textfield__label" for="badge_id">badge id</label>
 			</div>
@@ -24,7 +24,7 @@
 				<label class="mdl-textfield__label" for="badge_key">badge secret key</label>
 			</div>
 			
-			<br />
+			<br />-->
 			
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" type="text" name="badge_nick" value="<%= badge_nickname%>" />
@@ -42,17 +42,17 @@
 				<label class="mdl-textfield__label" for="badge_email">email (optional)</label>
 			</div>
 			
-			<!-- <br />
+			<br />
 			
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_password1" />
-				<label class="mdl-textfield__label" for="badge_password1">password (optional)</label>
+				<input class="mdl-textfield__input" type="password" name="badge_password1" />
+				<label class="mdl-textfield__label" for="badge_password1">password</label>
 			</div>
 
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_badge_password2" />
+				<input class="mdl-textfield__input" type="password" name="badge_password2" />
 				<label class="mdl-textfield__label" for="badge_password2">repeat password</label>
-			</div> -->
+			</div>
 			
 			<div class="mdl-card__actions">
 				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"

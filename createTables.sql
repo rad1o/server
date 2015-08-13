@@ -14,7 +14,7 @@ SET CHARACTER SET 'utf8';
 CREATE TABLE TA_BADGE (
 	sp_oid				integer 		NOT NULL AUTO_INCREMENT,
 	sp_badge_id			varchar(32) 	not NULL,
-	sp_badge_key		varchar(32)		not NULL,
+	sp_badge_key		varchar(32)		default NULL,
 	sp_nickname			varchar(32)		default NULL,
 	sp_callsign			varchar(32)		default NULL,
 	sp_password			varchar(64)		default NULL,

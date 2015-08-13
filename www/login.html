@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<% var pageTitle = 'login with your badge'; %>
+<% var pageTitle = 'login'; %>
 <html>
 <% include head.html %>
 
 <body>
 
-<div id="badge_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
+<div id="login_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
 	<main class="mdl-layout__content content">
 	<div>
 		<p>
-		Here you can register your badge, so you will be able to participate to our challenges. Please enter the following data:
+		please log in:
 		</p>
 
 		<form action="login" method="post" name="login">
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_id" value="<%= badge_id%>" />
-				<label class="mdl-textfield__label" for="badge_id">badge id</label>
+				<input class="mdl-textfield__input" type="text" name="login_nickname" value="" />
+				<label class="mdl-textfield__label" for="login_nickname">nickname</label>
 			</div>
 			<br />
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_key" value="<%= badge_key%>" />
-				<label class="mdl-textfield__label" for="badge_key">badge secret key</label>
+				<input class="mdl-textfield__input" type="password" name="login_password" value="" />
+				<label class="mdl-textfield__label" for="badge_key">password</label>
 			</div>
 			
 			<div class="mdl-card__actions">
