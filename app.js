@@ -66,7 +66,7 @@ app.post('/login',function(req,res)
 
 	dbpool.getConnection(function(err, connection)
 	{
-		var sqlStatement = "UPDATE TA_BADGE SET sp_last_seen=now() WHERE sp_nickname=? and sp_password=?";
+		var sqlStatement = "UPDATE TA_BADGE SET sp_last_seen=now() WHERE sp_nickname=? and sp_password=sha2(?, 256)";
 		var sqlValues = [nickname, password];
 		connection.query(sqlStatement, sqlValues, function(err, result)
 		{
@@ -79,7 +79,7 @@ app.post('/login',function(req,res)
 			
 			if (result.changedRows == 1)
 			{
-				var sqlStatement = "select sp_badge_id from TA_BADGE WHERE sp_nickname=? and sp_password=?";
+				var sqlStatement = "select sp_badge_id from TA_BADGE WHERE sp_nickname=? and sp_password=sha2(?, 256)";
 				var sqlValues = [nickname, password];
 				connection.query(sqlStatement, sqlValues, function(err, result)
 				{
@@ -168,52 +168,74 @@ app.get('/challenge',function(req,res)
 	
 	if (!challengeId)
 	{
-		res.render(path.join(__dirname+'/www/challengechooser.html'));
-		return;
-	}
-	
-	dbpool.getConnection(function(err, connection)
-	{
-		connection.query("SELECT * from TA_CHALLENGE where sp_id=?",
-		[challengeId],
-		function(err, rows)
+		dbpool.getConnection(function(err, connection)
 		{
-			connection.release();
-
-			if (err)
+			connection.query("SELECT sp_id, sp_title from TA_CHALLENGE where sp_class is not null",
+				[],
+				function(err, rows)
 			{
-				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
-				return;	
-			}
-			
-			//console.log('Query result: ', rows[0]);
-			
-			if (rows.length == 1)
-			{
-				var challenge = rows[0]; 
-					
-				res.render(path.join(__dirname+'/www/challenge.html'),
+				connection.release();
+	
+				if (err)
 				{
-					number      : challenge.sp_id,
-					title       : challenge.sp_title,
-					description : challenge.sp_description,	
-					answer1     : challenge.sp_answer1, 
-					answer2     : challenge.sp_answer2, 
-					answer3     : challenge.sp_answer3, 
-					answer4     : challenge.sp_answer4,
-					hint        : challenge.sp_hint,
-					credits     : challenge.sp_credits,
-					points      : challenge.sp_points
-				});
-				return;
-			}
-			else
-			{
-				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "no challenge found with that id"});
-				return;	
-			}
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				var challengeList = [];
+				for (i in rows)
+				{
+					var row = rows[i];
+					challengeList.push('<tr><td class="mdl-data-table__cell--non-numeric"><a href="/challenge?challengeid=' + row.sp_id + '">' + row.sp_title + '</a></td></tr>');
+				}
+						
+				res.render(path.join(__dirname+'/www/challengechooser.html'), { challengelist : challengeList.join('\n') });
+			});
 		});
-	});
+	}
+	else
+	{	
+		dbpool.getConnection(function(err, connection)
+		{
+			connection.query("SELECT * from TA_CHALLENGE where sp_id=?",
+			[challengeId],
+			function(err, rows)
+			{
+				connection.release();
+	
+				if (err)
+				{
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				//console.log('Query result: ', rows[0]);
+				
+				if (rows.length == 1)
+				{
+					var challenge = rows[0]; 
+						
+					res.render(path.join(__dirname+'/www/challenge.html'),
+					{
+						number      : challenge.sp_id,
+						title       : challenge.sp_title,
+						description : challenge.sp_description,	
+						answer1     : challenge.sp_answer1, 
+						answer2     : challenge.sp_answer2, 
+						answer3     : challenge.sp_answer3, 
+						answer4     : challenge.sp_answer4,
+						hint        : challenge.sp_hint,
+						credits     : challenge.sp_credits,
+						points      : challenge.sp_points
+					});
+				}
+				else
+				{
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : "no challenge found with that id"});
+				}
+			});
+		});
+	}
 });
 
 app.post('/challenge', function(req,res)
@@ -398,7 +420,7 @@ app.post('/registerbadge',function(req,res)
 			var newId = randomstring.generate(32);
 			//console.log('new ID: ', newId);
 			session.badgeid = newId;
-			sqlStatement = "insert into TA_BADGE (sp_nickname, sp_callsign, sp_email, sp_password, sp_register_time, sp_badge_id) values (?, ?, ?, ?, now(), ?)";
+			sqlStatement = "insert into TA_BADGE (sp_nickname, sp_callsign, sp_email, sp_password, sp_register_time, sp_badge_id) values (?, ?, ?, sha2(?, 256), now(), ?)";
 			sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_password1, newId];
 		}	
 		connection.query(sqlStatement, sqlValues, function(err, result)

@@ -8,20 +8,19 @@
 <div id="challengechooser_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
-  <main class="mdl-layout__content content">
-		<form action="/challenge" method="get" name="challenge_chooser">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="challengeid" />
-				<label class="mdl-textfield__label" for="challengeid">challenge id</label>
-			</div>
-			<div style="margin-top: 2em;">
-				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
-					type="submit" id="challenge_send" value="open challenge" />
-			</div>
-		</form>   
+	<main class="mdl-layout__content content">
+  		<table class="mdl-data-table mdl-js-data-table">
+		  <thead>
+		    <tr>
+		      <th class="mdl-data-table__cell--non-numeric">please select the challenge you want to play</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <%- challengelist%>
+		  </tbody>
+		</table>
    </main>
 </div>
-
 
 </body>
 
