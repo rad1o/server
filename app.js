@@ -5,7 +5,7 @@ var express_session = require('express-session');
 var path = require("path");
 var ejs = require('ejs'); 
 var favicon = require('serve-favicon');
-var crypto = require('crypto');
+var randomstring = require("randomstring");
 
 var mysql = require('mysql');
 var dbpool = mysql.createPool(
@@ -225,17 +225,62 @@ app.post('/challenge', function(req,res)
 		return;
 	}
 	
+	var challengeId = req.body.challenge_id;
+	var answer = req.body.options;
+	
+	if (!answer)
+	{
+		res.render(path.join(__dirname+'/www/error.html'), {errormessage : "please select your answer."});	
+		return;
+	}
+	
 	dbpool.getConnection(function(err, connection)
 	{
-		connection.query("SELECT * from TA_CHALLENGE where sp_number=?",
+		connection.query("select sp_answer, sp_score from TA_CHALLENGE where sp_number = ?",
 		[challengeId],
 		function(err, rows)
 		{
-			connection.release();
-
 			if (err)
 			{
+				connection.release();
 				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+				return;	
+			}
+			
+			if (rows.length == 1)
+			{
+				var challenge = rows[0];
+				var score = 0;
+				
+				if (answer == challenge.sp_correct_answer)
+				{
+					score = challenge.sp_score;
+				}				
+				
+				connection.query("insert into TA_BADGE_CHALLENGE (fk_badge, fk_challenge, sp_score, sp_answer) "
+					+ "values ((select sp_oid from TA_BADGE where sp_badge_id = ?), "
+					+ "(select sp_oid from TA_CHALLENGE where sp_number = ?), ?, ?);",
+				[session.badgeid, challengeId, score, challenge.sp_correct_answer],
+				function(err, rows)
+				{
+					connection.release();
+		
+					if (err)
+					{
+						res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+						return;	
+					}
+					
+					res.render(path.join(__dirname+'/www/success.html'), {
+						message : "your answer was submited, we added " + score + " points to your score",
+						target : "/"
+					});		
+				});
+			}
+			else
+			{
+				connection.release();
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "error: your answer could not be submited. please try again"});
 				return;	
 			}
 		});
@@ -324,8 +369,11 @@ app.post('/registerbadge',function(req,res)
 		}
 		else
 		{
+			var newId = randomstring.generate(32);
+			//console.log('new ID: ', newId);
+			session.badgeid = newId;
 			sqlStatement = "insert into TA_BADGE (sp_nickname, sp_callsign, sp_email, sp_password, sp_register_time, sp_badge_id) values (?, ?, ?, ?, now(), ?)";
-			sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_password1, crypto.randomBytes(32)];
+			sqlValues = [req.body.badge_nick, req.body.badge_callsign, req.body.badge_email, req.body.badge_password1, newId];
 		}	
 		connection.query(sqlStatement, sqlValues, function(err, result)
 		{
@@ -338,6 +386,8 @@ app.post('/registerbadge',function(req,res)
 			
 			if (result.affectedRows == 1)
 			{
+				session.nickname = req.body.badge_nick;
+				
 				res.render(path.join(__dirname+'/www/success.html'), {
 					message : "badge data updated. if you want, you can now upload an image as avatar. if not, please select something from the menu.",
 					target : "/imageconverter"
@@ -372,7 +422,7 @@ app.post('/imageupload',function(req,res)
 		return;
 	}
 		
-	if (true || req.body.image_avatar)
+	if (req.body.image_avatar)
 	{
 		dbpool.getConnection(function(err, connection)
 		{
