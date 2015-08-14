@@ -41,7 +41,9 @@ app.use(bodyParser.urlencoded(
 	extended: true
 }));
 
-app.get('/',function(req,res)
+var prefix = '/challenge';
+
+app.get(prefix + '/',function(req,res)
 {
 	if (!req.session.badgeid)
 	{
@@ -52,7 +54,7 @@ app.get('/',function(req,res)
 	res.render(path.join(__dirname+'/www/index.html'), { nickname : req.session.nickname });
 });
 
-app.post('/login',function(req,res)
+app.post(prefix + '/login',function(req,res)
 {
 	if (req.body.login_nickname == "" || req.body.login_password == "")
 	{
@@ -87,7 +89,7 @@ app.post('/login',function(req,res)
 					session.nickname = nickname;
 					session.badgeid = result[0].sp_badge_id;
 					
-					res.redirect('/');
+					res.redirect(prefix + '/');
 					return;
 				});
 			}
@@ -99,7 +101,7 @@ app.post('/login',function(req,res)
 	});
 });
 
-app.get('/register',function(req,res)
+app.get(prefix + '/register',function(req,res)
 {
 	//console.log('register: ', req.query.badgeid, "   ", req.query.badgekey);
 	if (req.session.badgeid)
@@ -162,7 +164,7 @@ app.get('/register',function(req,res)
 	}
 });
 
-app.get('/challenge',function(req,res)
+app.get(prefix + '/challenge',function(req,res)
 {
 	var challengeId = req.query.challengeid;
 	
@@ -238,7 +240,7 @@ app.get('/challenge',function(req,res)
 	}
 });
 
-app.post('/challenge', function(req,res)
+app.post(prefix + '/challenge', function(req,res)
 {	
 	var session = req.session;
 
@@ -309,7 +311,7 @@ app.post('/challenge', function(req,res)
 					
 					res.render(path.join(__dirname+'/www/success.html'), {
 						message : "your answer was submited, please select your next challenge.",
-						target : "/"
+						target : prefix + "/"
 					});		
 				});
 			}
@@ -323,7 +325,7 @@ app.post('/challenge', function(req,res)
 	});
 });
 
-app.get('/highscore',function(req,res)
+app.get('prefix + /highscore',function(req,res)
 {
 	var badgeId = req.session.badgeid;
 	
@@ -396,7 +398,7 @@ app.get('/highscore',function(req,res)
 	});
 });
 
-app.post('/registerbadge',function(req,res)
+app.post(prefix + '/registerbadge',function(req,res)
 {	
 	if (req.body.badge_nick == "" || req.body.badge_password1 == "" || req.body.badge_password1 != req.body.badge_password2)
 	{
@@ -438,7 +440,7 @@ app.post('/registerbadge',function(req,res)
 				
 				res.render(path.join(__dirname+'/www/success.html'), {
 					message : "badge data updated. please select now something from the menu.",
-					target : "/"
+					target : prefix + "/"
 				});		
 			}
 			else
@@ -449,7 +451,7 @@ app.post('/registerbadge',function(req,res)
 	});
 });
 
-app.get('/imageconverter',function(req,res)
+app.get(prefix + '/imageconverter',function(req,res)
 {	
 	if (!req.session.badgeid)
 	{
@@ -460,13 +462,13 @@ app.get('/imageconverter',function(req,res)
 	res.render(path.join(__dirname+'/www/imageupload.html'));
 });
 
-app.post('/imageupload',function(req,res)
+app.post(prefix + '/imageupload',function(req,res)
 {
 	var session = req.session;
 	
 	if (!req.session.badgeid)
 	{
-		res.redirect('/');
+		res.redirect(prefix + '/');
 		return;
 	}
 		
@@ -490,7 +492,7 @@ app.post('/imageupload',function(req,res)
 				{
 					res.render(path.join(__dirname+'/www/success.html'), {
 						message : "your image was added as your avatar.",
-						target : "/"
+						target : prefix + "/"
 					});
 				}
 				else
@@ -508,6 +510,6 @@ app.post('/imageupload',function(req,res)
 });
 
 
-app.listen(80);
+app.listen(8080);
 
-console.log("Running at Port 80");
+console.log("Running at Port 8080");
