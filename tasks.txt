@@ -1,8 +1,6 @@
-Bug:  Badge_id Zufallsstring fixen
 Task: Bilderupload
 Task: Bild konvertieren
 Task: Bild zum Download anbieten
-Task: MV in DB refreshen
 Task: Logout bauen (niedrige Prio)
 Bug:  CSS Layout
 Task: HTTPS

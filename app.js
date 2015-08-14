@@ -308,7 +308,7 @@ app.post('/challenge', function(req,res)
 					}
 					
 					res.render(path.join(__dirname+'/www/success.html'), {
-						message : "your answer was submited, we added " + score + " points to your score",
+						message : "your answer was submited, please select your next challenge.",
 						target : "/"
 					});		
 				});
@@ -437,8 +437,8 @@ app.post('/registerbadge',function(req,res)
 				session.nickname = req.body.badge_nick;
 				
 				res.render(path.join(__dirname+'/www/success.html'), {
-					message : "badge data updated. if you want, you can now upload an image as avatar. if not, please select something from the menu.",
-					target : "/imageconverter"
+					message : "badge data updated. please select now something from the menu.",
+					target : "/"
 				});		
 			}
 			else
