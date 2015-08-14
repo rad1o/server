@@ -87,10 +87,8 @@ app.post('/login',function(req,res)
 					session.nickname = nickname;
 					session.badgeid = result[0].sp_badge_id;
 					
-					res.render(path.join(__dirname+'/www/success.html'), {
-						message : "you are now logged in. please select something from the menu.",
-						target : "/"
-					});		
+					res.redirect('/');
+					return;
 				});
 			}
 			else
@@ -176,7 +174,7 @@ app.get('/challenge',function(req,res)
 	
 	dbpool.getConnection(function(err, connection)
 	{
-		connection.query("SELECT * from TA_CHALLENGE where sp_number=?",
+		connection.query("SELECT * from TA_CHALLENGE where sp_id=?",
 		[challengeId],
 		function(err, rows)
 		{
@@ -190,21 +188,30 @@ app.get('/challenge',function(req,res)
 			
 			//console.log('Query result: ', rows[0]);
 			
-			var challenge = rows[0]; 
-				
-			res.render(path.join(__dirname+'/www/challenge.html'),
+			if (rows.length == 1)
 			{
-				number      : challenge.sp_number,
-				title       : challenge.sp_title,
-				description : challenge.sp_description,	
-				answer1     : challenge.sp_answer1, 
-				answer2     : challenge.sp_answer2, 
-				answer3     : challenge.sp_answer3, 
-				answer4     : challenge.sp_answer4,
-				hint        : challenge.sp_hint,
-				credits     : challenge.sp_credits,
-				points      : challenge.sp_points
-			});
+				var challenge = rows[0]; 
+					
+				res.render(path.join(__dirname+'/www/challenge.html'),
+				{
+					number      : challenge.sp_id,
+					title       : challenge.sp_title,
+					description : challenge.sp_description,	
+					answer1     : challenge.sp_answer1, 
+					answer2     : challenge.sp_answer2, 
+					answer3     : challenge.sp_answer3, 
+					answer4     : challenge.sp_answer4,
+					hint        : challenge.sp_hint,
+					credits     : challenge.sp_credits,
+					points      : challenge.sp_points
+				});
+				return;
+			}
+			else
+			{
+				res.render(path.join(__dirname+'/www/error.html'), {errormessage : "no challenge found with that id"});
+				return;	
+			}
 		});
 	});
 });
@@ -236,7 +243,7 @@ app.post('/challenge', function(req,res)
 	
 	dbpool.getConnection(function(err, connection)
 	{
-		connection.query("select sp_answer, sp_score from TA_CHALLENGE where sp_number = ?",
+		connection.query("select sp_correct_answer, sp_points from TA_CHALLENGE where sp_id = ?",
 		[challengeId],
 		function(err, rows)
 		{
@@ -251,21 +258,28 @@ app.post('/challenge', function(req,res)
 			{
 				var challenge = rows[0];
 				var score = 0;
+				var correctAnswer = challenge.sp_correct_answer;
 				
-				if (answer == challenge.sp_correct_answer)
+				if (answer == correctAnswer)
 				{
-					score = challenge.sp_score;
+					score = challenge.sp_points;
 				}				
 				
-				connection.query("insert into TA_BADGE_CHALLENGE (fk_badge, fk_challenge, sp_score, sp_answer) "
+				connection.query("insert into TA_BADGE_CHALLENGE (fk_badge, fk_challenge, sp_answer, sp_score) "
 					+ "values ((select sp_oid from TA_BADGE where sp_badge_id = ?), "
-					+ "(select sp_oid from TA_CHALLENGE where sp_number = ?), ?, ?);",
-				[session.badgeid, challengeId, score, challenge.sp_correct_answer],
+					+ "(select sp_oid from TA_CHALLENGE where sp_id = ?), ?, ?);",
+				[session.badgeid, challengeId, correctAnswer, score],
 				function(err, rows)
 				{
 					connection.release();
-		
-					if (err)
+					
+					
+					if (err && err.code === 'ER_DUP_ENTRY')
+					{
+						res.render(path.join(__dirname+'/www/error.html'), {errormessage : "you already answered this question"});
+						return;							
+					}
+					else if (err)
 					{
 						res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
 						return;	
@@ -298,51 +312,63 @@ app.get('/highscore',function(req,res)
 	
 	dbpool.getConnection(function(err, connection)
 	{
-		connection.query('select * from MV_HIGHSCORE LIMIT 10 UNION select * from MV_HIGHSCORE where badgeid = ?;',
-						  badgeId,
-						  function(err, rows)
+		connection.query("call refreshHighscore;",
+		[],
+		function(err, rows)
 		{
-			connection.release();
-			
 			if (err)
 			{
+				connection.release();
 				res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
 				return;	
 			}
-			
-			var toptentable = [];
-			for (var i in rows)
+	
+			connection.query('select * from MV_HIGHSCORE LIMIT 10 UNION select * from MV_HIGHSCORE where badgeid = ?;',
+							  badgeId,
+							  function(err, rows)
 			{
-				var row = rows[i];
-				if (row.badgeid == badgeId)
+				connection.release();
+				
+				if (err)
 				{
-					if (row.rank > 11)
+					res.render(path.join(__dirname+'/www/error.html'), {errormessage : err});
+					return;	
+				}
+				
+				var toptentable = [];
+				for (var i in rows)
+				{
+					var row = rows[i];
+					if (row.badgeid == badgeId)
 					{
-						toptentable.push('<tr><td colspan="5">...</td></tr>');		
+						if (row.rank > 11)
+						{
+							toptentable.push('<tr><td colspan="5">...</td></tr>');		
+						}
+						toptentable.push('<tr class="toptentable-self">');
 					}
-					toptentable.push('<tr class="toptentable-self">');
-				}
-				else
+					else
+					{
+						toptentable.push('<tr>');
+					}
+					
+					var image = 'logo.png';
+					if (row.image != null)
+					{
+						image = row.image;
+					}
+					
+					toptentable.push('<td>' + row.rank + '</td>');
+					toptentable.push('<td><img src="' + image + '"/></td>');
+					toptentable.push('<td>' + row.nickname + '</td>');
+					toptentable.push('<td>' + row.score + '</td>');
+					toptentable.push('<td>' + row.challenges_played + '</td></tr>');
+				}		
+					
+				res.render(path.join(__dirname+'/www/highscore.html'),
 				{
-					toptentable.push('<tr>');
-				}
-				
-				var image = 'logo.png';
-				if (row.image != null)
-				{
-					image = row.image;
-				}
-				
-				toptentable.push('<td>' + row.rank + '</td>');
-				toptentable.push('<td><img src="' + image + '"/></td>');
-				toptentable.push('<td>' + row.nickname + '</td>');
-				toptentable.push('<td>' + row.score + '</td>');
-				toptentable.push('<td>' + row.challenges_played + '</td></tr>');
-			}		
-				
-			res.render(path.join(__dirname+'/www/highscore.html'),
-			{
-				toptentable : toptentable.join('\n')
+					toptentable : toptentable.join('\n')
+				});
 			});
 		});
 	});

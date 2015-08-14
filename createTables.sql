@@ -30,7 +30,7 @@ CREATE TABLE TA_BADGE (
 
 CREATE TABLE TA_CHALLENGE (
 	sp_oid				integer 		NOT NULL AUTO_INCREMENT,
-	sp_number			integer			not NULL,
+	sp_id				varchar(32)		not NULL,
 	sp_class			varchar(32)		not NULL,				
 	sp_title			varchar(32)		not NULL,
 	sp_description		varchar(1000)	not NULL,
@@ -58,7 +58,7 @@ CREATE TABLE TA_BADGE_CHALLENGE (
 	fk_badge			integer			not null,
 	fk_challenge		integer			not null,
 	sp_comment			varchar(300)	default NULL,
-	sp_score			integer			not NULL,
+	sp_	score			integer			not NULL,
 	sp_answer			integer			NOT NULL,
 	sp_time_done		timestamp		default CURRENT_TIMESTAMP,
 	sp_data				blob			default NULL,
@@ -106,26 +106,36 @@ CREATE TABLE TA_MESSAGE_BADGE (
 
 
 -- MVs
-CREATE TABLE MV_HIGHSCORE AS
-select  @currow := @currow + 1 as rank,
-		badgeid, 
-		nickname,
-        image,
-        score,
-        challenges_played
-from (
-	select  b.sp_badge_id      as badgeid,
-			b.sp_nickname      as nickname,
-			b.sp_icon          as image,
-			sum(bc.sp_score)   as score,
-			count(bc.fk_badge) as challenges_played
-	from TA_BADGE_CHALLENGE bc
-	inner join TA_BADGE b on bc.fk_badge = b.sp_oid
-	group by bc.fk_badge
-	order by score desc
-) scores
-JOIN (SELECT @currow := 0) r
-;
+USE `rad1o`;
+DROP procedure IF EXISTS `refreshHighscore`;
 
-create index IN_HIGHSCORE_BADGE_ID ON
-MV_HIGHSCORE(badgeid);
+DELIMITER $$
+USE `rad1o`$$
+CREATE PROCEDURE `refreshHighscore` ()
+BEGIN
+	DROP TABLE IF EXISTS MV_HIGHSCORE;
+
+	create TABLE MV_HIGHSCORE AS
+	select  @currow := @currow + 1 as rank,
+			badgeid,
+			nickname,
+			image,
+			score,
+			challenges_played
+	from (
+		select  b.sp_badge_id      as badgeid,
+				b.sp_nickname      as nickname,
+				b.sp_icon          as image,
+				sum(bc.sp_score)   as score,
+				count(bc.fk_badge) as challenges_played
+		from TA_BADGE_CHALLENGE bc
+		inner join TA_BADGE b on bc.fk_badge = b.sp_oid
+		group by bc.fk_badge
+		order by score desc
+	) scores
+	JOIN (SELECT @currow := 0) r
+	;
+END
+$$
+
+DELIMITER ;
