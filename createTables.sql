@@ -44,7 +44,7 @@ CREATE TABLE TA_CHALLENGE (
 	sp_image			blob			default NULL,
 	sp_comment			varchar(300)	default NULL,	
 	CONSTRAINT PK_OID PRIMARY KEY (sp_oid),
-	UNIQUE (sp_number)
+	UNIQUE (sp_id)
 );
 
 CREATE TABLE TA_BADGE_CHALLENGE (
