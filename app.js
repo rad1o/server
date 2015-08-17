@@ -325,7 +325,7 @@ app.post(prefix + '/challenge', function(req,res)
 	});
 });
 
-app.get('prefix + /highscore',function(req,res)
+app.get(prefix + '/highscore',function(req,res)
 {
 	var badgeId = req.session.badgeid;
 	
