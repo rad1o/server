@@ -8,51 +8,50 @@
 <div id="register_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
-  <main class="mdl-layout__content content">
-  <div>
-		<p>
-		here you can register, so you will be able to participate to our challenges, just enter the following data.
-		please use a throw away password for your own security.
-		</p>
+	<main class="mdl-layout__content">
+	  	<div class="content">
+			<p>
+			here you can register, so you will be able to participate to our challenges, just enter the following data.
+			please use a throw away password for your own security.
+			</p>
 
-		<form action="registerbadge" method="post" name="badge_registration">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_nick" value="<%= badge_nickname%>" />
-				<label class="mdl-textfield__label" for="badge_nick">nick / name</label>
-			</div>
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_callsign" value="<%= badge_callsign%>" />
-				<label class="mdl-textfield__label" for="badge_callsign">call sign (optional)</label>
-			</div>
+			<form action="register" method="post" name="badge_registration">
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="text" name="badge_nick" value="<%= badge_nickname%>" />
+					<label class="mdl-textfield__label" for="badge_nick">nick / name</label>
+				</div>
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="text" name="badge_serial" value="<%= badge_serial%>" />
+					<label class="mdl-textfield__label" for="badge_serial">serial number (optional)</label>
+				</div>
 			
-			<br />
+				<br />
 			
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="badge_email" value="<%= badge_email%>" />
-				<label class="mdl-textfield__label" for="badge_email">email (optional)</label>
-			</div>
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="text" name="badge_email" value="<%= badge_email%>" />
+					<label class="mdl-textfield__label" for="badge_email">email (optional)</label>
+				</div>
 			
-			<br />
+				<br />
 			
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="password" name="badge_password1" />
-				<label class="mdl-textfield__label" for="badge_password1">password</label>
-			</div>
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="password" name="badge_password1" />
+					<label class="mdl-textfield__label" for="badge_password1">password</label>
+				</div>
 
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="password" name="badge_password2" />
-				<label class="mdl-textfield__label" for="badge_password2">repeat password</label>
-			</div>
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="password" name="badge_password2" />
+					<label class="mdl-textfield__label" for="badge_password2">repeat password</label>
+				</div>
 			
-			<div class="mdl-card__actions">
-				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
-					type="submit" id="badge_sendregistration" value="register" />
-			</div>
-		</form>
-	</div>
-  </main>
+				<div class="mdl-card__actions">
+					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+						type="submit" id="badge_sendregistration" value="register" />
+				</div>
+			</form>
+		</div>
+	</main>
 </div>
-
 
 </body>
 

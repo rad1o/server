@@ -12,7 +12,6 @@ CREATE TABLE TA_BADGE (
 	sp_badge_id			varchar(32) 	not NULL,
 	sp_badge_key		varchar(32)		default NULL,
 	sp_nickname			varchar(32)		default NULL,
-	sp_callsign			varchar(32)		default NULL,
 	sp_password			varchar(64)		default NULL,
 	sp_email			varchar(100)	default NULL,
 	sp_register_time	timestamp		default 0,

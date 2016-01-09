@@ -8,30 +8,30 @@
 <div id="imageupload_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
-  <main class="mdl-layout__content content">
-  <div>
-		<p>
-		Upload an image to convert it into the badge format. If you like, you can also use this as your avatar on this site.
-		</p>
+	<main class="mdl-layout__content">
+	  <div class="content">
+			<p>
+			Upload an image to convert it into the badge format. If you like, you can also use this as your avatar on this site.
+			</p>
 
-		<form action="imageupload" method="post" name="image_upload" enctype="multipart/form-data">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" style="padding-left: 10em;" type="file" id="image" accept="image/*" />
-				<label class="mdl-textfield__label" for="image">image</label>
-			</div>
+			<form action="imageupload" method="post" name="image_upload" enctype="multipart/form-data">
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" style="padding-left: 10em;" type="file" id="image" accept="image/*" />
+					<label class="mdl-textfield__label" for="image">image</label>
+				</div>
 			
-			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="image_avatar">
-				<input type="checkbox" id="image_avatar" class="mdl-checkbox__input" checked="checked" />
-				<span class="mdl-checkbox__label">use image as avatar</span>
-			</label>
+				<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="image_avatar">
+					<input type="checkbox" id="image_avatar" class="mdl-checkbox__input" checked="checked" />
+					<span class="mdl-checkbox__label">use image as avatar</span>
+				</label>
 			
-			<div style="margin-top: 2em;">
-				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
-					type="submit" id="convertimage" value="upload and convert" />
-			</div>
-		</form>
-	</div>
-  </main>
+				<div style="margin-top: 2em;">
+					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+						type="submit" id="convertimage" value="upload and convert" />
+				</div>
+			</form>
+		</div>
+	</main>
 </div>
 
 

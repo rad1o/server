@@ -8,32 +8,32 @@
 <div id="login_dialog" class="mdl-layout mdl-js-layout mdl-layout--overlay-drawer-button">
 	<% include header_nav.html %>
   
-	<main class="mdl-layout__content content">
-	<div>
-		<p>
-		please log in:
-		</p>
+	<main class="mdl-layout__content">
+		<div class="content">
+			<p>
+			please log in:
+			</p>
 
-		<form action="login" method="post" name="login">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="text" name="login_nickname" value="" />
-				<label class="mdl-textfield__label" for="login_nickname">nickname</label>
-			</div>
-			<br />
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-				<input class="mdl-textfield__input" type="password" name="login_password" value="" />
-				<label class="mdl-textfield__label" for="badge_key">password</label>
-			</div>
+			<form action="login" method="post" name="login">
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="text" name="login_nickname" value="" />
+					<label class="mdl-textfield__label" for="login_nickname">nickname</label>
+				</div>
+				<br />
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+					<input class="mdl-textfield__input" type="password" name="login_password" value="" />
+					<label class="mdl-textfield__label" for="badge_key">password</label>
+				</div>
 			
-			<div class="mdl-card__actions">
-				<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
-					type="submit" id="login_send" value="login" />
-				<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="/register">
-		      		register
-		    	</a>
-			</div>
-		</form>
-	</div>
+				<div class="mdl-card__actions">
+					<input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+						type="submit" id="login_send" value="login" />
+					<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="/register">
+				  		register
+					</a>
+				</div>
+			</form>
+		</div>
 	</main>
 </div>
 

@@ -1,3 +1,5 @@
+<% var prefix = ''; %>
+
 <header class="mdl-layout__header mdl-layout--fixed-header">
   <div class="mdl-layout-icon"><i class="material-icons">menu</i></div>
   <div class="mdl-layout__header-row">
@@ -8,8 +10,8 @@
 <div class="mdl-layout__drawer">
   <span class="mdl-layout-title">rad1o</span>
   <nav class="mdl-navigation">
-  	<a class="mdl-navigation__link" href="/challenge/">home</a>
-    <a class="mdl-navigation__link" href="/challenge/challenge">play challenge</a>
+  	<a class="mdl-navigation__link" href="<%= prefix %>/">home</a>
+    <a class="mdl-navigation__link" href="<%= prefix %>/challenge">play challenge</a>
     <a class="mdl-navigation__link" href="https://rad1o.badge.events.ccc.de" target="_blank">goto wiki</a>
   </nav>
 </div>

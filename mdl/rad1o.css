@@ -3,14 +3,26 @@ body {
 }
 
 main {
-	background:rgba(255,255,255,0.7);
-	box-shadow: 10px 10px 5px rgba(100,100,100,0.4);
+
 }
 
 .content {
 	margin: 1em auto;
 	padding: 1em;
 	max-width: 42em;
+	background:rgba(255,255,255,0.7);
+	box-shadow: 10px 10px 5px rgba(100,100,100,0.4);
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.mdl-card {
+	background: none;
+	border: none;
+	box-shadow: none;
+	margin: -1em;
+	padding: 0;
 }
 
 .mdl-textfield {
@@ -22,7 +34,7 @@ main {
 }
 
 .mdl-layout__header {
-	display:block !important;
+	display: block !important;
 }
 
 .mdl-card__title-text {
@@ -73,4 +85,18 @@ main {
 
 .toptentable-self {
 	background-color: #FFCCCC;
+}
+
+h2.success {
+	width: 100%;
+	margin: -5px;
+	padding: 5px;
+	background:rgba(0,255,0,0.7);
+}
+
+h2.error {
+	width: 100%;
+	margin: -5px;
+	padding: 5px;
+	background:rgba(255,0,0,0.7);
 }
